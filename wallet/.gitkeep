@@ -1,0 +1,2 @@
+# This file keeps the wallet/ directory tracked by git.
+# Actual wallet files (*.txt) are excluded via .gitignore.

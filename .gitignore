@@ -1,0 +1,4 @@
+# .gitignore
+.env
+wallet/*.txt
+node_modules/
