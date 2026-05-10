@@ -46,6 +46,18 @@ const CHAINS = {
     symbol:  'ETH',
     label:   'Base',
   },
+  knyx: {
+    rpc:     process.env.RPC_KNYX,
+    chainId: 3009,
+    symbol:  'KNYX',
+    label:   'Knyx',
+  },
+  bsctestnet: {
+    rpc:     process.env.RPC_BSCTESTNET,
+    chainId: 97,
+    symbol:  'tBNB',
+    label:   'BSC Testnet',
+  }
 };
 
 // ─── Minimal ERC20 ABI (only what we need) ───────────────────────────────────
@@ -84,6 +96,22 @@ function decryptPrivateKey(encryptedBase64, password) {
   ]);
 
   return decrypted.toString('utf8');
+}
+
+// ─── Password prompt (no echo) ────────────────────────────────────────────────
+function askPassword(prompt) {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({
+      input:  process.stdin,
+      output: process.stdout,
+    });
+    rl._writeToOutput = (s) => { if (s === prompt) rl.output.write(s); };
+    rl.question(prompt, (password) => {
+      rl.close();
+      process.stdout.write('\n');
+      resolve(password.trim());
+    });
+  });
 }
 
 // ─── Readline confirmation helper ────────────────────────────────────────────
@@ -150,10 +178,10 @@ function box(title, lines) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 async function main() {
 
-  // ── 1. Environment validation ────────────────────────────────────────────────
-  const password = process.env.PASSWORD;
-  if (!password || password.trim() === '') {
-    console.error('Error: PASSWORD is not set in the .env file.');
+  // ── 1. Prompt for password ───────────────────────────────────────────────────
+  const password = await askPassword('Enter password: ');
+  if (!password) {
+    console.error('Error: Password cannot be empty.');
     process.exit(1);
   }
 

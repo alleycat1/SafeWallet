@@ -1,11 +1,10 @@
 'use strict';
 
-require('dotenv').config();
-
 const { Wallet } = require('ethers');
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+const crypto   = require('crypto');
+const fs       = require('fs');
+const path     = require('path');
+const readline = require('readline');
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const WALLET_DIR  = path.join(__dirname, 'wallet');
@@ -38,12 +37,28 @@ function encryptPrivateKey(privateKey, password) {
   return combined.toString('base64');
 }
 
+// ─── Password prompt (no echo) ────────────────────────────────────────────────
+function askPassword(prompt) {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({
+      input:  process.stdin,
+      output: process.stdout,
+    });
+    rl._writeToOutput = (s) => { if (s === prompt) rl.output.write(s); };
+    rl.question(prompt, (password) => {
+      rl.close();
+      process.stdout.write('\n');
+      resolve(password.trim());
+    });
+  });
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
-function main() {
-  // Validate environment
-  const password = process.env.PASSWORD;
-  if (!password || password.trim() === '') {
-    console.error('Error: PASSWORD is not set in the .env file.');
+async function main() {
+  // Prompt for password
+  const password = await askPassword('Enter password: ');
+  if (!password) {
+    console.error('Error: Password cannot be empty.');
     process.exit(1);
   }
 
@@ -66,4 +81,4 @@ function main() {
   console.log(`Saved to       : wallet/${address}.txt`);
 }
 
-main();
+main().catch((err) => { console.error(err.message); process.exit(1); });
