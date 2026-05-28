@@ -25,7 +25,7 @@ function deriveKey(password, salt) {
 function encryptPrivateKey(privateKey, password) {
   const salt      = crypto.randomBytes(SALT_LEN);
   const iv        = crypto.randomBytes(IV_LEN);
-  const key       = deriveKey(password + '122927', salt);
+  const key       = deriveKey(password, salt);
 
   const cipher    = crypto.createCipheriv('aes-256-cbc', key, iv);
   const encrypted = Buffer.concat([
