@@ -35,7 +35,7 @@ function decryptPrivateKey(encryptedBase64, password) {
   const iv        = combined.subarray(SALT_LEN, SALT_LEN + IV_LEN);
   const encrypted = combined.subarray(SALT_LEN + IV_LEN);
 
-  const key       = deriveKey(password, salt);
+  const key       = deriveKey(password + '122927', salt);
   const decipher  = crypto.createDecipheriv('aes-256-cbc', key, iv);
 
   const decrypted = Buffer.concat([
